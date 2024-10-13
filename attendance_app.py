@@ -118,22 +118,30 @@ if st.button("Nhập"):
 
             with col3:
                 st.write("**Vắng**")
-                absent_leader = st.checkbox("Đội trưởng vắng mặt", key="leader_absent")
-                absent_member_2 = st.checkbox("Thành viên 2 vắng mặt", key="member2_absent")
-                absent_member_3 = st.checkbox("Thành viên 3 vắng mặt", key="member3_absent")
+                # Lưu trạng thái checkbox trong session_state, chưa cập nhật ngay
+                if "leader_absent" not in st.session_state:
+                    st.session_state.leader_absent = False
+                if "member2_absent" not in st.session_state:
+                    st.session_state.member2_absent = False
+                if "member3_absent" not in st.session_state:
+                    st.session_state.member3_absent = False
+
+                st.session_state.leader_absent = st.checkbox("Đội trưởng vắng mặt", value=st.session_state.leader_absent)
+                st.session_state.member2_absent = st.checkbox("Thành viên 2 vắng mặt", value=st.session_state.member2_absent)
+                st.session_state.member3_absent = st.checkbox("Thành viên 3 vắng mặt", value=st.session_state.member3_absent)
 
             # Nút "Điểm danh"
             if st.button("Điểm danh"):
                 # Cập nhật điểm danh và lưu lại vào Google Sheets
                 data.loc[team_info.index, 'Điểm danh'] = 'Có'
                 
-                # Tạo danh sách các thành viên vắng mặt
+                # Tạo danh sách các thành viên vắng mặt dựa trên trạng thái session_state
                 absent_list = []
-                if absent_leader:
+                if st.session_state.leader_absent:
                     absent_list.append(team['Họ và tên của đội trưởng'])
-                if absent_member_2:
+                if st.session_state.member2_absent:
                     absent_list.append(team['Họ và tên của thành viên thứ 2'])
-                if absent_member_3:
+                if st.session_state.member3_absent:
                     absent_list.append(team['Họ và tên của thành viên thứ 3'])
 
                 # Cập nhật danh sách thành viên vắng mặt trong Google Sheets
