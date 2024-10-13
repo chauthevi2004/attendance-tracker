@@ -97,7 +97,8 @@ if not data.empty:
         st.write("### Thông tin đội")
         st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
         st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
-        
+        st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
+
         if not team_info.empty:
             st.write("### Thông tin thành viên")
             header_col1, header_col2, header_col3 = st.columns(3)
@@ -146,9 +147,6 @@ if not data.empty:
                 update_sheet(sheet, data)
                 st.success("Đã cập nhật điểm danh.")
         else:
-            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
-            
-        st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
-        
+            st.error("Không tìm thấy đội với thông tin đã cung cấp.")        
 else:
     st.error("Không tải được dữ liệu từ Google Sheet.")
