@@ -5,11 +5,20 @@ import pandas as pd
 
 # Kết nối với Google Sheets API bằng ID của trang tính
 def connect_to_google_sheets_by_id(sheet_id):
+    # Phạm vi quyền truy cập
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds_dict = st.secrets["gcp_service_account"]
+    
+    # Đọc thông tin credentials từ Streamlit secrets (không cần json.loads)
+    creds_dict = st.secrets["gcp_service_account"]  # Sử dụng trực tiếp secrets
+    
+    # Tạo credentials từ từ điển
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    
+    # Ủy quyền kết nối
     client = gspread.authorize(creds)
+    
     try:
+        # Mở Google Sheet bằng ID thay vì tên
         sheet = client.open_by_key(sheet_id).sheet1
         return sheet
     except gspread.SpreadsheetNotFound:
@@ -22,14 +31,15 @@ def connect_to_google_sheets_by_id(sheet_id):
 # Lấy dữ liệu từ Google Sheets và chuyển thành DataFrame
 def get_sheet_data(sheet):
     if sheet is not None:
-        data = sheet.get_all_records()
+        data = sheet.get_all_records()  # Lấy toàn bộ dữ liệu từ Google Sheet
         df = pd.DataFrame(data)
         return df
     else:
-        return pd.DataFrame()
+        return pd.DataFrame()  # Trả về DataFrame rỗng nếu không kết nối được
 
-# Chức năng tìm đội theo MSSV hoặc email đội trưởng
+# Chức năng tìm đội theo MSSV
 def lookup_team(query, data):
+    # Tìm kiếm dựa trên MSSV, tên đội, đội trưởng hoặc tên thành viên
     team_info = data[(data['MSSV thành viên thứ 2'].astype(str) == query) | 
                      (data['MSSV thành viên thứ 3'].astype(str) == query) |
                      (data['Email Address'].str.contains(query)) |
@@ -39,76 +49,48 @@ def lookup_team(query, data):
                      (data['Họ và tên của thành viên thứ 3'].str.contains(query, case=False))]
     return team_info
 
-# Hàm để trích xuất MSSV từ email
-def extract_mssv_from_email(email):
-    # Giả sử MSSV là phần đầu của email trước dấu '@'
-    mssv = email.split('@')[0]
-    return mssv
-
 # Streamlit app
 st.title("ICPC Attendance Tracker")
 
+# ID của Google Sheet - thay bằng ID của Google Sheet của bạn
 sheet_id = "18sSJDh7vBKdapozCpv4qUrRFP9ZZOOs8z3XOVqIGJDU"  # Thay thế bằng Google Sheet ID của bạn
 sheet = connect_to_google_sheets_by_id(sheet_id)
+
+# Tải dữ liệu từ Google Sheets
 data = get_sheet_data(sheet)
 
 # Nhập MSSV từ người dùng
 mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
 
+# Thêm nút "Nhập"
 if st.button("Nhập"):
     if mssv_input:
-        st.session_state.query = mssv_input
+        # Lưu MSSV vào session state
+        st.session_state.query = mssv_input  # Lưu MSSV vào session_state
         team_info = lookup_team(st.session_state.query, data)
         
         if not team_info.empty:
             st.write("### Thông tin đội:")
+            
+            # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
             team = team_info.iloc[0]
             
-            # Trích xuất MSSV đội trưởng từ email
-            mssv_team_leader = extract_mssv_from_email(team['Email Address'])
-            
-            st.markdown(f"Tên đội: **{team['Tên đội (phải bắt đầu bằng UIT.)']}**")
-            st.markdown(f"Email: {team['Email Address']}")
-            
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.write("Họ và tên")
-                st.write(f"{team['Họ và tên của đội trưởng']}")
-                st.write(f"{team['Họ và tên của thành viên thứ 2']}")
-                st.write(f"{team['Họ và tên của thành viên thứ 3']}")
-            with col2:
-                st.write("MSSV")
-                st.write(f"{mssv_team_leader}")  # Hiển thị MSSV đội trưởng trích xuất từ email
-                st.write(f"{team['MSSV thành viên thứ 2']}")
-                st.write(f"{team['MSSV thành viên thứ 3']}")
-            with col3:
-                st.write("Vắng")
-                v_team_leader = st.checkbox("Vắng đội trưởng", key="v_team_leader")
-                v_member_2 = st.checkbox("Vắng thành viên thứ 2", key="v_member_2")
-                v_member_3 = st.checkbox("Vắng thành viên thứ 3", key="v_member_3")
-            
+            # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
+            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
+            st.markdown(f"Đội trưởng: <span style='color: yellow;'>{team['Họ và tên của đội trưởng']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Thành viên thứ 2: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 2']}</span>", unsafe_allow_html=True)
+            st.markdown(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}", unsafe_allow_html=True)            
+            st.markdown(f"Thành viên thứ 3: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 3']}</span>", unsafe_allow_html=True)
+            st.markdown(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}", unsafe_allow_html=True)
+            st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
+
             if st.button("Điểm danh"):
-                v_absent_list = []
-                
-                if v_team_leader:
-                    v_absent_list.append(team['Họ và tên của đội trưởng'])
-                if v_member_2:
-                    v_absent_list.append(team['Họ và tên của thành viên thứ 2'])
-                if v_member_3:
-                    v_absent_list.append(team['Họ và tên của thành viên thứ 3'])
-                
-                v_absent_str = ", ".join(v_absent_list)
-                
-                # Cập nhật dữ liệu điểm danh và vắng mặt
+                # Cập nhật điểm danh và lưu lại vào Google Sheets
                 data.loc[team_info.index, 'Điểm danh'] = 'Có'
-                data.loc[team_info.index, 'Vắng'] = v_absent_str
-                
-                # Cập nhật lại Google Sheet
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
-                
-                st.success(f"Đã điểm danh và cập nhật trạng thái vắng cho đội với MSSV: {st.session_state.query}")
+                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.mssv}")
         else:
             st.error("Không tìm thấy đội với thông tin đã cung cấp.")
     else:
         st.error("Vui lòng nhập thông tin tìm kiếm.")
-
