@@ -45,7 +45,7 @@ def lookup_team_by_mssv(mssv, data):
     return team_info
 
 # Streamlit app
-st.title("Student Attendance Tracker")
+st.title("ICPC Attendance Tracker")
 
 # ID của Google Sheet - thay bằng ID của Google Sheet của bạn
 sheet_id = "18sSJDh7vBKdapozCpv4qUrRFP9ZZOOs8z3XOVqIGJDU"  # Thay thế bằng Google Sheet ID của bạn
