@@ -119,7 +119,7 @@ if not data.empty:
             with col2:
                 st.write(f"{team_info['MSSV Đội trưởng'].values[0]}")
             with col3:
-                if st.checkbox(f"Vắng mặt - Đội trưởng"):
+                if st.checkbox(f"Đội trưởng"):
                     absent_members.append(team_info['Họ và tên của đội trưởng'].values[0])
 
             # Hiển thị thành viên thứ 2
@@ -128,7 +128,7 @@ if not data.empty:
             with col2:
                 st.write(f"{team_info['MSSV thành viên thứ 2'].values[0]}")
             with col3:
-                if st.checkbox(f"Vắng mặt - Thành viên 2"):
+                if st.checkbox(f"Thành viên 2"):
                     absent_members.append(team_info['Họ và tên của thành viên thứ 2'].values[0])
 
             # Hiển thị thành viên thứ 3
@@ -137,7 +137,7 @@ if not data.empty:
             with col2:
                 st.write(f"{team_info['MSSV thành viên thứ 3'].values[0]}")
             with col3:
-                if st.checkbox(f"Vắng mặt - Thành viên 3"):
+                if st.checkbox(f"Thành viên 3"):
                     absent_members.append(team_info['Họ và tên của thành viên thứ 3'].values[0])
 
             if st.button("Điểm danh"):
