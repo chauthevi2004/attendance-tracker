@@ -112,9 +112,3 @@ if st.button("Nhập"):
     else:
         st.error("Vui lòng nhập thông tin tìm kiếm.")
 
-                
-                st.success(f"Đã điểm danh và cập nhật trạng thái vắng cho đội với MSSV: {st.session_state.query}")
-        else:
-            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
-    else:
-        st.error("Vui lòng nhập thông tin tìm kiếm.")
