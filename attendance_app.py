@@ -68,14 +68,14 @@ if not data.empty:
             team = team_info.iloc[0]
             
             # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
-            st.markdown(f"<span style='color: yellow; font-weight: bold;'>Tên đội:</span> **{team['Tên đội (phải bắt đầu bằng UIT.)']}**", unsafe_allow_html=True)
-            st.write(f"Email: {team['Email Address']}")
-            st.markdown(f"<span style='color: yellow;'>Họ và tên đội trưởng:</span> {team['Họ và tên của đội trưởng']}", unsafe_allow_html=True)
-            st.markdown(f"<span style='color: yellow;'>Họ và tên thành viên thứ 2:</span> {team['Họ và tên của thành viên thứ 2']}", unsafe_allow_html=True)
-            st.write(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}")            
-            st.markdown(f"<span style='color: yellow;'>Họ và tên thành viên thứ 3:</span> {team['Họ và tên của thành viên thứ 3']}", unsafe_allow_html=True)
-            st.write(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}")
-            st.markdown(f"<span style='color: green; font-weight: bold;'>Điểm danh:</span> {team['Điểm danh']}", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: yellow; font-weight: bold;'>Tên đội:</span> <span style='color: yellow;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
+            st.write(f"<span style='color: yellow;'>Email:</span> <span style='color: yellow;'>{team['Email Address']}</span>", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: yellow;'>Họ và tên đội trưởng:</span> <span style='color: yellow;'>{team['Họ và tên của đội trưởng']}</span>", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: yellow;'>Họ và tên thành viên thứ 2:</span> <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 2']}</span>", unsafe_allow_html=True)
+            st.write(f"<span style='color: yellow;'>MSSV thành viên thứ 2:</span> <span style='color: yellow;'>{team['MSSV thành viên thứ 2']}</span>", unsafe_allow_html=True)            
+            st.markdown(f"<span style='color: yellow;'>Họ và tên thành viên thứ 3:</span> <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 3']}</span>", unsafe_allow_html=True)
+            st.write(f"<span style='color: yellow;'>MSSV thành viên thứ 3:</span> <span style='color: yellow;'>{team['MSSV thành viên thứ 3']}</span>", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: green; font-weight: bold;'>Điểm danh:</span> <span style='color: green;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
             
             if st.button("Điểm danh"):
