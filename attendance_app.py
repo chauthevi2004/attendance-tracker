@@ -92,9 +92,11 @@ if not data.empty:
 
     if query:
         team_info = lookup_team(query, data)
-
+        team = team_info.iloc[0]
+        st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
+        st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
         if not team_info.empty:
-            st.write("### Bảng Điểm Danh")
+            st.write("### Thông tin thành viên")
             header_col1, header_col2, header_col3 = st.columns(3)
 
             # Tiêu đề cho mỗi cột
