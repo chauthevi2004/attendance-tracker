@@ -68,6 +68,8 @@ if not data.empty:
             team = team_info.iloc[0]
             
             # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
+            st.write(f"Tên đội: {team['Tên đội (phải bắt đầu bằng UIT.)']}")
+            st.write(f"Họ và tên đội trưởng: {team['Họ và tên của đội trưởng']}")
             st.write(f"Họ và tên thành viên thứ 2: {team['Họ và tên của thành viên thứ 2']}")
             st.write(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}")            
             st.write(f"Họ và tên thành viên thứ 3: {team['Họ và tên của thành viên thứ 3']}")
