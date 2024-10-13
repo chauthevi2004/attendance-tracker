@@ -95,7 +95,8 @@ if not data.empty:
 
         if not team_info.empty:
             st.write("### Thông tin đội:")
-            st.dataframe(team_info)
+            st.markdown(f"<span style='color: yellow; font-weight: bold;'>Tên đội:</span> **{team['Tên đội (phải bắt đầu bằng UIT.)']}**", unsafe_allow_html=True)
+            st.write(f"Email: {team['Email Address']}")
 
             # Hiển thị các cột: Họ và tên, MSSV, checkbox Vắng mặt
             absent_members = []  # Danh sách thành viên vắng mặt
