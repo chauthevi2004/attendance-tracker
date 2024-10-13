@@ -72,7 +72,7 @@ sheet_id = "18sSJDh7vBKdapozCpv4qUrRFP9ZZOOs8z3XOVqIGJDU"  # Thay thế bằng G
 sheet = connect_to_google_sheets_by_id(sheet_id)
 
 # Streamlit app
-st.title("Student Attendance Tracker")
+st.title("ICPC Attendance Tracker")
 
 # Tải dữ liệu từ Google Sheets
 data = get_sheet_data(sheet)
