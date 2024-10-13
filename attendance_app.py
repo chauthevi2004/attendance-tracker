@@ -76,7 +76,7 @@ def mark_attendance(mssv, data):
 st.title("Student Attendance Tracker")
 
 # Nhập ID Google Sheet của bạn
-sheet_id = st.text_input("Nhập ID của Google Sheet:", "")
+sheet_id = "18sSJDh7vBKdapozCpv4qUrRFP9ZZOOs8z3XOVqIGJDU"
 
 if sheet_id:
     sheet = connect_to_google_sheets_by_id(sheet_id)
