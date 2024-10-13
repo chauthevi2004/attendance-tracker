@@ -87,7 +87,7 @@ if st.button("Nhập"):
 
             if st.button("Điểm danh"):
                 # Cập nhật điểm danh và lưu lại vào Google Sheets
-                data.loc[team_info.index, 'Điểm danh'] = 'Có'
+                data.loc[team_info.index, 'Điểm danh'] = 'Yes'
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
                 st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.mssv}")
         else:
