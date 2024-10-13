@@ -90,59 +90,57 @@ if not data.empty:
     # Nhập MSSV hoặc thông tin tìm kiếm
     query = st.text_input("Nhập MSSV hoặc thông tin để tìm kiếm đội:", "")
 
-    # Thêm nút nhập để tìm kiếm
-    if st.button("Nhập"):
-        if query:
-            team_info = lookup_team(query, data)
+    if query:
+        team_info = lookup_team(query, data)
 
-            if not team_info.empty:
-                st.write("### Bảng Điểm Danh")
-                header_col1, header_col2, header_col3 = st.columns(3)
+        if not team_info.empty:
+            st.write("### Bảng Điểm Danh")
+            header_col1, header_col2, header_col3 = st.columns(3)
 
-                # Tiêu đề cho mỗi cột
-                with header_col1:
-                    st.write("**Họ và tên**")
-                with header_col2:
-                    st.write("**MSSV**")
-                with header_col3:
-                    st.write("**Vắng mặt**")
+            # Tiêu đề cho mỗi cột
+            with header_col1:
+                st.write("**Họ và tên**")
+            with header_col2:
+                st.write("**MSSV**")
+            with header_col3:
+                st.write("**Vắng mặt**")
 
-                absent_members = []  # Danh sách thành viên vắng mặt
-                col1, col2, col3 = st.columns(3)
+            absent_members = []  # Danh sách thành viên vắng mặt
+            col1, col2, col3 = st.columns(3)
 
-                # Hiển thị đội trưởng
-                with col1:
-                    st.write(f"{team_info['Họ và tên của đội trưởng'].values[0]}")
-                with col2:
-                    st.write(f"{team_info['MSSV Đội trưởng'].values[0]}")
-                with col3:
-                    if st.checkbox(f"Vắng mặt - Đội trưởng"):
-                        absent_members.append(team_info['Họ và tên của đội trưởng'].values[0])
+            # Hiển thị đội trưởng
+            with col1:
+                st.write(f"{team_info['Họ và tên của đội trưởng'].values[0]}")
+            with col2:
+                st.write(f"{team_info['MSSV Đội trưởng'].values[0]}")
+            with col3:
+                if st.checkbox(f"Vắng mặt - Đội trưởng"):
+                    absent_members.append(team_info['Họ và tên của đội trưởng'].values[0])
 
-                # Hiển thị thành viên thứ 2
-                with col1:
-                    st.write(f"{team_info['Họ và tên của thành viên thứ 2'].values[0]}")
-                with col2:
-                    st.write(f"{team_info['MSSV thành viên thứ 2'].values[0]}")
-                with col3:
-                    if st.checkbox(f"Vắng mặt - Thành viên 2"):
-                        absent_members.append(team_info['Họ và tên của thành viên thứ 2'].values[0])
+            # Hiển thị thành viên thứ 2
+            with col1:
+                st.write(f"{team_info['Họ và tên của thành viên thứ 2'].values[0]}")
+            with col2:
+                st.write(f"{team_info['MSSV thành viên thứ 2'].values[0]}")
+            with col3:
+                if st.checkbox(f"Vắng mặt - Thành viên 2"):
+                    absent_members.append(team_info['Họ và tên của thành viên thứ 2'].values[0])
 
-                # Hiển thị thành viên thứ 3
-                with col1:
-                    st.write(f"{team_info['Họ và tên của thành viên thứ 3'].values[0]}")
-                with col2:
-                    st.write(f"{team_info['MSSV thành viên thứ 3'].values[0]}")
-                with col3:
-                    if st.checkbox(f"Vắng mặt - Thành viên 3"):
-                        absent_members.append(team_info['Họ và tên của thành viên thứ 3'].values[0])
+            # Hiển thị thành viên thứ 3
+            with col1:
+                st.write(f"{team_info['Họ và tên của thành viên thứ 3'].values[0]}")
+            with col2:
+                st.write(f"{team_info['MSSV thành viên thứ 3'].values[0]}")
+            with col3:
+                if st.checkbox(f"Vắng mặt - Thành viên 3"):
+                    absent_members.append(team_info['Họ và tên của thành viên thứ 3'].values[0])
 
-                if st.button("Điểm danh"):
-                    # Cập nhật điểm danh và vắng mặt
-                    data = mark_attendance(query, data, absent_members)
-                    update_sheet(sheet, data)
-                    st.success("Đã cập nhật điểm danh.")
-            else:
-                st.error("Không tìm thấy đội với thông tin đã cung cấp.")
+            if st.button("Điểm danh"):
+                # Cập nhật điểm danh và vắng mặt
+                data = mark_attendance(query, data, absent_members)
+                update_sheet(sheet, data)
+                st.success("Đã cập nhật điểm danh.")
+        else:
+            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
 else:
     st.error("Không tải được dữ liệu từ Google Sheet.")
