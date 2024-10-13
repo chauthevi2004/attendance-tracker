@@ -49,15 +49,6 @@ def lookup_team(query, data):
                      (data['Họ và tên của thành viên thứ 3'].str.contains(query, case=False))]
     return team_info
 
-# Trích xuất MSSV từ email của đội trưởng
-def extract_mssv_from_email(email):
-    # Giả định rằng MSSV là một chuỗi số ở đầu email trước @
-    try:
-        mssv = email.split('@')[0]
-        return mssv
-    except IndexError:
-        return "Không tìm thấy MSSV"
-
 # Streamlit app
 st.title("ICPC Attendance Tracker")
 
@@ -71,81 +62,35 @@ data = get_sheet_data(sheet)
 # Nhập MSSV từ người dùng
 mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
 
-# Chỉ xử lý logic khi đã nhập MSSV
-if mssv_input:
-    # Lưu MSSV vào session state
-    st.session_state.query = mssv_input  # Lưu MSSV vào session_state
-    team_info = lookup_team(st.session_state.query, data)
-
-    if not team_info.empty:
-        st.write("### Thông tin đội:")
-
-        # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
-        team = team_info.iloc[0]
-
-        # Trích xuất MSSV của đội trưởng từ email
-        leader_mssv = extract_mssv_from_email(team['Email Address'])
-
-        # Hiển thị thông tin theo dạng bảng với ba cột
-        st.markdown("#### Thông tin các thành viên")
-        st.markdown("""
-        <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        # Bảng thành viên với tên, MSSV và checkbox để đánh dấu vắng mặt
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.write("**Họ và tên thành viên**")
-            st.write(f"Đội trưởng: {team['Họ và tên của đội trưởng']}")
-            st.write(f"Thành viên 2: {team['Họ và tên của thành viên thứ 2']}")
-            st.write(f"Thành viên 3: {team['Họ và tên của thành viên thứ 3']}")
-
-        with col2:
-            st.write("**MSSV**")
-            st.write(f"{leader_mssv}")
-            st.write(f"{team['MSSV thành viên thứ 2']}")
-            st.write(f"{team['MSSV thành viên thứ 3']}")
-
-        with col3:
-            st.write("**Vắng**")
-            # Sử dụng session_state để lưu trạng thái của các checkbox
-            leader_absent = st.checkbox("Đội trưởng vắng mặt", key="leader_absent", value=st.session_state.get("leader_absent", False))
-            member2_absent = st.checkbox("Thành viên 2 vắng mặt", key="member2_absent", value=st.session_state.get("member2_absent", False))
-            member3_absent = st.checkbox("Thành viên 3 vắng mặt", key="member3_absent", value=st.session_state.get("member3_absent", False))
-
-            # Cập nhật trạng thái vào session_state
-            st.session_state.leader_absent = leader_absent
-            st.session_state.member2_absent = member2_absent
-            st.session_state.member3_absent = member3_absent
-
-        # Nút "Điểm danh"
-        if st.button("Điểm danh"):
-            # Cập nhật điểm danh và lưu lại vào Google Sheets
-            data.loc[team_info.index, 'Điểm danh'] = 'Có'
+# Thêm nút "Nhập"
+if st.button("Nhập"):
+    if mssv_input:
+        # Lưu MSSV vào session state
+        st.session_state.query = mssv_input  # Lưu MSSV vào session_state
+        team_info = lookup_team(st.session_state.query, data)
+        
+        if not team_info.empty:
+            st.write("### Thông tin đội:")
             
-            # Tạo danh sách các thành viên vắng mặt dựa trên trạng thái session_state
-            absent_list = []
-            if st.session_state.leader_absent:
-                absent_list.append(team['Họ và tên của đội trưởng'])
-            if st.session_state.member2_absent:
-                absent_list.append(team['Họ và tên của thành viên thứ 2'])
-            if st.session_state.member3_absent:
-                absent_list.append(team['Họ và tên của thành viên thứ 3'])
+            # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
+            team = team_info.iloc[0]
+            
+            # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
+            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
+            st.markdown(f"Đội trưởng: <span style='color: yellow;'>{team['Họ và tên của đội trưởng']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Thành viên thứ 2: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 2']}</span>", unsafe_allow_html=True)
+            st.markdown(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}", unsafe_allow_html=True)            
+            st.markdown(f"Thành viên thứ 3: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 3']}</span>", unsafe_allow_html=True)
+            st.markdown(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}", unsafe_allow_html=True)
+            st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
-            # Cập nhật danh sách thành viên vắng mặt trong Google Sheets
-            data.loc[team_info.index, 'Thành viên vắng mặt'] = ', '.join(absent_list)
-
-            # Cập nhật vào Google Sheets
-            sheet.update([data.columns.values.tolist()] + data.values.tolist())
-            st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.query}")
+            if st.button("Điểm danh"):
+                # Cập nhật điểm danh và lưu lại vào Google Sheets
+                data.loc[team_info.index, 'Điểm danh'] = 'Có'
+                sheet.update([data.columns.values.tolist()] + data.values.tolist())
+                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.mssv}")
+        else:
+            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
     else:
-        st.error("Không tìm thấy đội với thông tin đã cung cấp.")
+        st.error("Vui lòng nhập thông tin tìm kiếm.")
