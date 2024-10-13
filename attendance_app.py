@@ -38,10 +38,15 @@ def get_sheet_data(sheet):
         return pd.DataFrame()  # Trả về DataFrame rỗng nếu không kết nối được
 
 # Chức năng tìm đội theo MSSV
-def lookup_team_by_mssv(mssv, data):
-    team_info = data[(data['MSSV thành viên thứ 2'].astype(str) == mssv) | 
-                     (data['MSSV thành viên thứ 3'].astype(str) == mssv) |
-                     (data['Email Address'].str.contains(mssv))]
+def lookup_team(query, data):
+    # Tìm kiếm dựa trên MSSV, tên đội, đội trưởng hoặc tên thành viên
+    team_info = data[(data['MSSV thành viên thứ 2'].astype(str) == query) | 
+                     (data['MSSV thành viên thứ 3'].astype(str) == query) |
+                     (data['Email Address'].str.contains(query)) |
+                     (data['Tên đội (phải bắt đầu bằng UIT.)'].str.contains(query, case=False)) |
+                     (data['Họ và tên của đội trưởng'].str.contains(query, case=False)) |
+                     (data['Họ và tên của thành viên thứ 2'].str.contains(query, case=False)) |
+                     (data['Họ và tên của thành viên thứ 3'].str.contains(query, case=False))]
     return team_info
 
 # Streamlit app
@@ -55,14 +60,14 @@ sheet = connect_to_google_sheets_by_id(sheet_id)
 data = get_sheet_data(sheet)
 
 # Nhập MSSV từ người dùng
-mssv_input = st.text_input("Nhập MSSV để tìm kiếm đội:", "")
+mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
 
 # Thêm nút "Nhập"
 if st.button("Nhập"):
     if mssv_input:
         # Lưu MSSV vào session state
-        st.session_state.mssv = mssv_input  # Lưu MSSV vào session_state
-        team_info = lookup_team_by_mssv(st.session_state.mssv, data)
+        st.session_state.query = mssv_input  # Lưu MSSV vào session_state
+        team_info = lookup_team(st.session_state.query, data)
         
         if not team_info.empty:
             st.write("### Thông tin đội:")
@@ -70,22 +75,62 @@ if st.button("Nhập"):
             # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
             team = team_info.iloc[0]
             
-            # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
-            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
-            st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
-            st.markdown(f"Đội trưởng: <span style='color: yellow;'>{team['Họ và tên của đội trưởng']}</span>", unsafe_allow_html=True)
-            st.markdown(f"Thành viên thứ 2: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 2']}</span>", unsafe_allow_html=True)
-            st.markdown(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}", unsafe_allow_html=True)            
-            st.markdown(f"Thành viên thứ 3: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 3']}</span>", unsafe_allow_html=True)
-            st.markdown(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}", unsafe_allow_html=True)
-            st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
+            # Hiển thị thông tin theo dạng bảng với ba cột
+            st.markdown("#### Thông tin các thành viên")
+            st.markdown("""
+            <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
 
+            # Bảng thành viên với tên, MSSV và checkbox để đánh dấu vắng mặt
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.write("**Họ và tên thành viên**")
+                st.write(f"Đội trưởng: {team['Họ và tên của đội trưởng']}")
+                st.write(f"Thành viên 2: {team['Họ và tên của thành viên thứ 2']}")
+                st.write(f"Thành viên 3: {team['Họ và tên của thành viên thứ 3']}")
+
+            with col2:
+                st.write("**MSSV**")
+                st.write(f"{team['MSSV thành viên thứ 2']}")
+                st.write(f"{team['MSSV thành viên thứ 2']}")
+                st.write(f"{team['MSSV thành viên thứ 3']}")
+
+            with col3:
+                st.write("**Vắng**")
+                absent_leader = st.checkbox("Đội trưởng vắng mặt", key="leader_absent")
+                absent_member_2 = st.checkbox("Thành viên 2 vắng mặt", key="member2_absent")
+                absent_member_3 = st.checkbox("Thành viên 3 vắng mặt", key="member3_absent")
+
+            # Nút "Điểm danh"
             if st.button("Điểm danh"):
                 # Cập nhật điểm danh và lưu lại vào Google Sheets
-                data.loc[team_info.index, 'Điểm danh'] = 'Yes'
+                data.loc[team_info.index, 'Điểm danh'] = 'Có'
+                
+                # Tạo danh sách các thành viên vắng mặt
+                absent_list = []
+                if absent_leader:
+                    absent_list.append(team['Họ và tên của đội trưởng'])
+                if absent_member_2:
+                    absent_list.append(team['Họ và tên của thành viên thứ 2'])
+                if absent_member_3:
+                    absent_list.append(team['Họ và tên của thành viên thứ 3'])
+
+                # Cập nhật danh sách thành viên vắng mặt trong Google Sheets
+                data.loc[team_info.index, 'Thành viên vắng mặt'] = ', '.join(absent_list)
+
+                # Cập nhật vào Google Sheets
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
-                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.mssv}")
+                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.query}")
         else:
-            st.error("Không tìm thấy đội với MSSV đã cung cấp.")
+            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
     else:
-        st.error("Vui lòng nhập MSSV.")
+        st.error("Vui lòng nhập thông tin tìm kiếm.")
