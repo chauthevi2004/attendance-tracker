@@ -75,6 +75,14 @@ if st.button("Nhập"):
             # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
             team = team_info.iloc[0]
 
+            # Khởi tạo session_state cho các checkbox nếu chưa có
+            if 'absent_leader' not in st.session_state:
+                st.session_state.absent_leader = False
+            if 'absent_member2' not in st.session_state:
+                st.session_state.absent_member2 = False
+            if 'absent_member3' not in st.session_state:
+                st.session_state.absent_member3 = False
+
             # Hiển thị 3 cột: Họ và tên, MSSV, Vắng
             st.write("### Điền trạng thái vắng mặt:")
             col1, col2, col3 = st.columns(3)
@@ -85,7 +93,7 @@ if st.button("Nhập"):
             with col2:
                 st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 2']}")
             with col3:
-                absent_leader = st.checkbox("Vắng", key="absent_leader")
+                st.session_state.absent_leader = st.checkbox("Vắng", key="absent_leader", value=st.session_state.absent_leader)
             
             # Hàng 2: Thành viên 2
             with col1:
@@ -93,7 +101,7 @@ if st.button("Nhập"):
             with col2:
                 st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 2']}")
             with col3:
-                absent_member2 = st.checkbox("Vắng", key="absent_member2")
+                st.session_state.absent_member2 = st.checkbox("Vắng", key="absent_member2", value=st.session_state.absent_member2)
             
             # Hàng 3: Thành viên 3
             with col1:
@@ -101,17 +109,17 @@ if st.button("Nhập"):
             with col2:
                 st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 3']}")
             with col3:
-                absent_member3 = st.checkbox("Vắng", key="absent_member3")
+                st.session_state.absent_member3 = st.checkbox("Vắng", key="absent_member3", value=st.session_state.absent_member3)
 
             # Nút điểm danh
             if st.button("Điểm danh"):
                 # Cập nhật trạng thái "Vắng"
                 absentees = []
-                if absent_leader:
+                if st.session_state.absent_leader:
                     absentees.append(team['Họ và tên của đội trưởng'])
-                if absent_member2:
+                if st.session_state.absent_member2:
                     absentees.append(team['Họ và tên của thành viên thứ 2'])
-                if absent_member3:
+                if st.session_state.absent_member3:
                     absentees.append(team['Họ và tên của thành viên thứ 3'])
 
                 # Ghi vào cột "Vắng"
