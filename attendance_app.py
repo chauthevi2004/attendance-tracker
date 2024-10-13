@@ -49,6 +49,15 @@ def lookup_team(query, data):
                      (data['Họ và tên của thành viên thứ 3'].str.contains(query, case=False))]
     return team_info
 
+# Trích xuất MSSV từ email của đội trưởng
+def extract_mssv_from_email(email):
+    # Giả định rằng MSSV là một chuỗi số ở đầu email trước @
+    try:
+        mssv = email.split('@')[0]
+        return mssv
+    except IndexError:
+        return "Không tìm thấy MSSV"
+
 # Streamlit app
 st.title("ICPC Attendance Tracker")
 
@@ -75,6 +84,9 @@ if st.button("Nhập"):
             # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
             team = team_info.iloc[0]
             
+            # Trích xuất MSSV của đội trưởng từ email
+            leader_mssv = extract_mssv_from_email(team['Email Address'])
+            
             # Hiển thị thông tin theo dạng bảng với ba cột
             st.markdown("#### Thông tin các thành viên")
             st.markdown("""
@@ -100,7 +112,7 @@ if st.button("Nhập"):
 
             with col2:
                 st.write("**MSSV**")
-                st.write(f"{team['MSSV thành viên thứ 2']}")
+                st.write(f"{leader_mssv}")
                 st.write(f"{team['MSSV thành viên thứ 2']}")
                 st.write(f"{team['MSSV thành viên thứ 3']}")
 
