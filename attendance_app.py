@@ -71,7 +71,7 @@ if st.button("Nhập"):
             team = team_info.iloc[0]
             
             # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
-            st.markdown(f"Tên đội: <span style='color: yellow;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
             st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
             st.markdown(f"Đội trưởng: <span style='color: yellow;'>{team['Họ và tên của đội trưởng']}</span>", unsafe_allow_html=True)
             st.markdown(f"Thành viên thứ 2: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 2']}</span>", unsafe_allow_html=True)
