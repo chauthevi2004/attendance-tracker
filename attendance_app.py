@@ -75,7 +75,7 @@ if not data.empty:
             st.markdown(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}", unsafe_allow_html=True)            
             st.markdown(f"Họ và tên thành viên thứ 3: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 3']}</span>", unsafe_allow_html=True)
             st.markdown(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}", unsafe_allow_html=True)
-            st.markdown(f"Điểm danh: <span style='color: blue; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
             
             if st.button("Điểm danh"):
