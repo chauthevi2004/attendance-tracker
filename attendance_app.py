@@ -91,15 +91,17 @@ if not data.empty:
     query = st.text_input("Nhập MSSV hoặc thông tin để tìm kiếm đội:", "")
 
     if query:
-        team_info = lookup_team(query, data)
-        team = team_info.iloc[0]
+    team_info = lookup_team(query, data)
+    
+    if not team_info.empty:
+        st.write("### Thông tin các đội tìm thấy")
         
-        st.write("### Thông tin đội")
-        st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
-        st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
-        st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
+        for i, team in team_info.iterrows():  # Lặp qua từng đội tìm thấy
+            st.write(f"#### Đội {i + 1}")
+            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
+            st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
-        if not team_info.empty:
             st.write("### Thông tin thành viên")
             header_col1, header_col2, header_col3 = st.columns(3)
 
@@ -116,37 +118,37 @@ if not data.empty:
 
             # Hiển thị đội trưởng
             with col1:
-                st.write(f"{team_info['Họ và tên của đội trưởng'].values[0]}")
+                st.write(f"{team['Họ và tên của đội trưởng']}")
             with col2:
-                st.write(f"{team_info['MSSV Đội trưởng'].values[0]}")
+                st.write(f"{team['MSSV Đội trưởng']}")
             with col3:
-                if st.checkbox(f"Đội trưởng"):
-                    absent_members.append(team_info['Họ và tên của đội trưởng'].values[0])
+                if st.checkbox(f"Đội trưởng {i + 1}", key=f"leader_{i}"):
+                    absent_members.append(team['Họ và tên của đội trưởng'])
 
             # Hiển thị thành viên thứ 2
             with col1:
-                st.write(f"{team_info['Họ và tên của thành viên thứ 2'].values[0]}")
+                st.write(f"{team['Họ và tên của thành viên thứ 2']}")
             with col2:
-                st.write(f"{team_info['MSSV thành viên thứ 2'].values[0]}")
+                st.write(f"{team['MSSV thành viên thứ 2']}")
             with col3:
-                if st.checkbox(f"Thành viên 2"):
-                    absent_members.append(team_info['Họ và tên của thành viên thứ 2'].values[0])
+                if st.checkbox(f"Thành viên 2 {i + 1}", key=f"member2_{i}"):
+                    absent_members.append(team['Họ và tên của thành viên thứ 2'])
 
             # Hiển thị thành viên thứ 3
             with col1:
-                st.write(f"{team_info['Họ và tên của thành viên thứ 3'].values[0]}")
+                st.write(f"{team['Họ và tên của thành viên thứ 3']}")
             with col2:
-                st.write(f"{team_info['MSSV thành viên thứ 3'].values[0]}")
+                st.write(f"{team['MSSV thành viên thứ 3']}")
             with col3:
-                if st.checkbox(f"Thành viên 3"):
-                    absent_members.append(team_info['Họ và tên của thành viên thứ 3'].values[0])
+                if st.checkbox(f"Thành viên 3 {i + 1}", key=f"member3_{i}"):
+                    absent_members.append(team['Họ và tên của thành viên thứ 3'])
 
-            if st.button("Điểm danh"):
+            if st.button(f"Điểm danh đội {i + 1}", key=f"attendance_{i}"):
                 # Cập nhật điểm danh và vắng mặt
                 data = mark_attendance(query, data, absent_members)
                 update_sheet(sheet, data)
-                st.success("Đã cập nhật điểm danh.")
-        else:
-            st.error("Không tìm thấy đội với thông tin đã cung cấp.")        
+                st.success(f"Đã cập nhật điểm danh cho đội {i + 1}.")
+    else:
+        st.error("Không tìm thấy đội với thông tin đã cung cấp.")   
 else:
     st.error("Không tải được dữ liệu từ Google Sheet.")
