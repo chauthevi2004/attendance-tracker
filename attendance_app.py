@@ -39,6 +39,12 @@ def lookup_team(query, data):
                      (data['Họ và tên của thành viên thứ 3'].str.contains(query, case=False))]
     return team_info
 
+# Hàm để trích xuất MSSV từ email
+def extract_mssv_from_email(email):
+    # Giả sử MSSV là phần đầu của email trước dấu '@'
+    mssv = email.split('@')[0]
+    return mssv
+
 # Streamlit app
 st.title("ICPC Attendance Tracker")
 
@@ -58,6 +64,9 @@ if st.button("Nhập"):
             st.write("### Thông tin đội:")
             team = team_info.iloc[0]
             
+            # Trích xuất MSSV đội trưởng từ email
+            mssv_team_leader = extract_mssv_from_email(team['Email Address'])
+            
             st.markdown(f"Tên đội: **{team['Tên đội (phải bắt đầu bằng UIT.)']}**")
             st.markdown(f"Email: {team['Email Address']}")
             
@@ -69,7 +78,7 @@ if st.button("Nhập"):
                 st.write(f"{team['Họ và tên của thành viên thứ 3']}")
             with col2:
                 st.write("MSSV")
-                st.write(f"{team['MSSV đội trưởng']}")
+                st.write(f"{mssv_team_leader}")  # Hiển thị MSSV đội trưởng trích xuất từ email
                 st.write(f"{team['MSSV thành viên thứ 2']}")
                 st.write(f"{team['MSSV thành viên thứ 3']}")
             with col3:
@@ -79,7 +88,6 @@ if st.button("Nhập"):
                 v_member_3 = st.checkbox("Vắng thành viên thứ 3", key="v_member_3")
             
             if st.button("Điểm danh"):
-                # Cập nhật điểm danh và trạng thái vắng mặt
                 v_absent_list = []
                 
                 if v_team_leader:
@@ -97,6 +105,13 @@ if st.button("Nhập"):
                 
                 # Cập nhật lại Google Sheet
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
+                
+                st.success(f"Đã điểm danh và cập nhật trạng thái vắng cho đội với MSSV: {st.session_state.query}")
+        else:
+            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
+    else:
+        st.error("Vui lòng nhập thông tin tìm kiếm.")
+
                 
                 st.success(f"Đã điểm danh và cập nhật trạng thái vắng cho đội với MSSV: {st.session_state.query}")
         else:
