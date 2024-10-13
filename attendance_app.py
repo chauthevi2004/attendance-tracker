@@ -117,10 +117,15 @@ if mssv_input:
 
         with col3:
             st.write("**Vắng**")
-            # Giữ trạng thái của checkbox bằng session_state
-            st.session_state.leader_absent = st.checkbox("Đội trưởng vắng mặt", key="leader_absent", value=st.session_state.get("leader_absent", False))
-            st.session_state.member2_absent = st.checkbox("Thành viên 2 vắng mặt", key="member2_absent", value=st.session_state.get("member2_absent", False))
-            st.session_state.member3_absent = st.checkbox("Thành viên 3 vắng mặt", key="member3_absent", value=st.session_state.get("member3_absent", False))
+            # Sử dụng session_state để lưu trạng thái của các checkbox
+            leader_absent = st.checkbox("Đội trưởng vắng mặt", key="leader_absent", value=st.session_state.get("leader_absent", False))
+            member2_absent = st.checkbox("Thành viên 2 vắng mặt", key="member2_absent", value=st.session_state.get("member2_absent", False))
+            member3_absent = st.checkbox("Thành viên 3 vắng mặt", key="member3_absent", value=st.session_state.get("member3_absent", False))
+
+            # Cập nhật trạng thái vào session_state
+            st.session_state.leader_absent = leader_absent
+            st.session_state.member2_absent = member2_absent
+            st.session_state.member3_absent = member3_absent
 
         # Nút "Điểm danh"
         if st.button("Điểm danh"):
