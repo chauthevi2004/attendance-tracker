@@ -147,5 +147,8 @@ if not data.empty:
                 st.success("Đã cập nhật điểm danh.")
         else:
             st.error("Không tìm thấy đội với thông tin đã cung cấp.")
+            
+        st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
+        
 else:
     st.error("Không tải được dữ liệu từ Google Sheet.")
