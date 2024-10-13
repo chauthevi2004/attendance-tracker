@@ -86,22 +86,15 @@ data = get_sheet_data(sheet)
 # Đảm bảo MSSV không có dấu phẩy
 data = format_mssv_columns(data)
 
-# Nhập thông tin từ người dùng
-mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
+if not data.empty:
+    # Nhập MSSV hoặc thông tin tìm kiếm
+    query = st.text_input("Nhập MSSV hoặc thông tin để tìm kiếm đội:", "")
 
+    if query:
+        team_info = lookup_team(query, data)
 
-# Thêm nút "Nhập"
-if st.button("Nhập"):
-    if mssv_input:
-        # Lưu MSSV vào session state
-        st.session_state.query = mssv_input  # Lưu MSSV vào session_state
-        team_info = lookup_team(st.session_state.query, data)
-        
         if not team_info.empty:
             st.write("### Thông tin đội:")
-            
-            # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
-            team = team_info.iloc[0]
             st.markdown(f"<span style='color: yellow; font-weight: bold;'>Tên đội:</span> **{team['Tên đội (phải bắt đầu bằng UIT.)']}**", unsafe_allow_html=True)
             st.write(f"Email: {team['Email Address']}")
 
@@ -143,3 +136,5 @@ if st.button("Nhập"):
                 st.success("Đã cập nhật điểm danh.")
         else:
             st.error("Không tìm thấy đội với thông tin đã cung cấp.")
+else:
+    st.error("Không tải được dữ liệu từ Google Sheet.")
