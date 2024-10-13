@@ -2,6 +2,9 @@ import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
+import io
+import json
+
 
 # Kết nối với Google Sheets API bằng ID của trang tính
 def connect_to_google_sheets_by_id(sheet_id):
@@ -37,61 +40,74 @@ def get_sheet_data(sheet):
     else:
         return pd.DataFrame()  # Trả về DataFrame rỗng nếu không kết nối được
 
+# Cập nhật dữ liệu trong Google Sheets
+def update_sheet(sheet, df):
+    if sheet is not None:
+        sheet.update([df.columns.values.tolist()] + df.values.tolist())
+
 # Chức năng tìm đội theo MSSV
-def lookup_team(query, data):
-    # Tìm kiếm dựa trên MSSV, tên đội, đội trưởng hoặc tên thành viên
-    team_info = data[(data['MSSV thành viên thứ 2'].astype(str) == query) | 
-                     (data['MSSV thành viên thứ 3'].astype(str) == query) |
-                     (data['Email Address'].str.contains(query)) |
-                     (data['Tên đội (phải bắt đầu bằng UIT.)'].str.contains(query, case=False)) |
-                     (data['Họ và tên của đội trưởng'].str.contains(query, case=False)) |
-                     (data['Họ và tên của thành viên thứ 2'].str.contains(query, case=False)) |
-                     (data['Họ và tên của thành viên thứ 3'].str.contains(query, case=False))]
+def lookup_team_by_mssv(mssv, data):
+    team_info = data[(data['MSSV thành viên thứ 2'].astype(str) == mssv) | 
+                     (data['MSSV thành viên thứ 3'].astype(str) == mssv) |
+                     (data['Email Address'].str.contains(mssv))]
     return team_info
 
-# Streamlit app
-st.title("ICPC Attendance Tracker")
+# Chức năng điểm danh cho một MSSV
+def mark_attendance(mssv, data):
+    team_info = lookup_team_by_mssv(mssv, data)
+    if not team_info.empty:
+        data.loc[team_info.index, 'Điểm danh'] = 'Yes'
+    return data
+
+# Chuyển đổi các cột MSSV thành chuỗi để đảm bảo không có dấu phẩy phân cách
+def format_mssv_columns(df):
+    mssv_columns = ['MSSV thành viên thứ 2', 'MSSV thành viên thứ 3', 'Email Address']
+    for col in mssv_columns:
+        if col in df.columns:
+            df[col] = df[col].astype(str)  # Chuyển các cột MSSV thành kiểu chuỗi
+    return df
 
 # ID của Google Sheet - thay bằng ID của Google Sheet của bạn
 sheet_id = "18sSJDh7vBKdapozCpv4qUrRFP9ZZOOs8z3XOVqIGJDU"  # Thay thế bằng Google Sheet ID của bạn
 sheet = connect_to_google_sheets_by_id(sheet_id)
 
+# Streamlit app
+st.title("ICPC Attendance Tracker")
+
 # Tải dữ liệu từ Google Sheets
 data = get_sheet_data(sheet)
 
-# Nhập MSSV từ người dùng
-mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
+# Đảm bảo MSSV không có dấu phẩy
+data = format_mssv_columns(data)
 
-# Thêm nút "Nhập"
-if st.button("Nhập"):
-    if mssv_input:
-        # Lưu MSSV vào session state
-        st.session_state.query = mssv_input  # Lưu MSSV vào session_state
-        team_info = lookup_team(st.session_state.query, data)
+if not data.empty:
+    # Nhập MSSV từ người dùng
+    mssv = st.text_input("Nhập MSSV để tìm kiếm đội:", "")
+
+    if mssv:
+        team_info = lookup_team_by_mssv(mssv, data)
         
         if not team_info.empty:
             st.write("### Thông tin đội:")
+            st.dataframe(team_info)
             
-            # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
-            team = team_info.iloc[0]
-            
-            # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
-            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
-            st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
-            st.markdown(f"Đội trưởng: <span style='color: yellow;'>{team['Họ và tên của đội trưởng']}</span>", unsafe_allow_html=True)
-            st.markdown(f"Thành viên thứ 2: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 2']}</span>", unsafe_allow_html=True)
-            st.markdown(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}", unsafe_allow_html=True)            
-            st.markdown(f"Thành viên thứ 3: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 3']}</span>", unsafe_allow_html=True)
-            st.markdown(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}", unsafe_allow_html=True)
-            st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
-
             if st.button("Điểm danh"):
-                # Luôn cho phép điểm danh và cập nhật dữ liệu
-                data.loc[team_info.index, 'Điểm danh'] = 'Yes'
-                sheet.update([data.columns.values.tolist()] + data.values.tolist())
-                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.query}")
+                # Cập nhật điểm danh và lưu lại vào Google Sheets
+                data = mark_attendance(mssv, data)
+                update_sheet(sheet, data)
+                st.success(f"Đã điểm danh cho đội với MSSV: {mssv}")
         else:
-            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
-    else:
-        st.error("Vui lòng nhập thông tin tìm kiếm.")
+            st.error("Không tìm thấy đội với MSSV đã cung cấp.")
+    
+    # Nút tải về file Excel với dữ liệu mới cập nhật
+    if st.button("Tải dữ liệu điểm danh"):
+        # Chuẩn bị file Excel để tải về
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+        output.seek(0)
 
+        # Cung cấp file tải về
+        st.download_button(label="Tải file Excel", data=output, file_name="attendance_updated.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+else:
+    st.error("Không tải được dữ liệu từ Google Sheet.")
