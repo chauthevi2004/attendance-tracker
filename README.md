@@ -79,7 +79,7 @@ The required packages are:
 
 Below is an example of the application interface:
 
-![Application Screenshot](https://path-to-your-image.png)
+![Application Screenshot](Screenshot-of-web.png)
 
 ## Code Overview
 
