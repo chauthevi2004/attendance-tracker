@@ -95,7 +95,6 @@ if not data.empty:
 
         if not team_info.empty:
             st.write("### Thông tin đội:")
-            st.dataframe(team_info)
 
             # Hiển thị các cột: Họ và tên, MSSV, checkbox Vắng mặt
             absent_members = []  # Danh sách thành viên vắng mặt
