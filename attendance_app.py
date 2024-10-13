@@ -54,12 +54,15 @@ sheet = connect_to_google_sheets_by_id(sheet_id)
 # Tải dữ liệu từ Google Sheets
 data = get_sheet_data(sheet)
 
-if not data.empty:
-    # Nhập MSSV từ người dùng
-    mssv = st.text_input("Nhập MSSV để tìm kiếm đội:", "")
+# Nhập MSSV từ người dùng
+mssv_input = st.text_input("Nhập MSSV để tìm kiếm đội:", "")
 
-    if mssv:
-        team_info = lookup_team_by_mssv(mssv, data)
+# Thêm nút "Nhập"
+if st.button("Nhập"):
+    if mssv_input:
+        # Lưu MSSV vào session state
+        st.session_state.mssv = mssv_input  # Lưu MSSV vào session_state
+        team_info = lookup_team_by_mssv(st.session_state.mssv, data)
         
         if not team_info.empty:
             st.write("### Thông tin đội:")
@@ -77,13 +80,12 @@ if not data.empty:
             st.markdown(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}", unsafe_allow_html=True)
             st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
-            
             if st.button("Điểm danh"):
                 # Cập nhật điểm danh và lưu lại vào Google Sheets
                 data.loc[team_info.index, 'Điểm danh'] = 'Yes'
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
-                st.success(f"Đã điểm danh cho đội với MSSV: {mssv}")
+                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.mssv}")
         else:
             st.error("Không tìm thấy đội với MSSV đã cung cấp.")
-else:
-    st.error("Không tải được dữ liệu từ Google Sheet.")
+    else:
+        st.error("Vui lòng nhập MSSV.")
