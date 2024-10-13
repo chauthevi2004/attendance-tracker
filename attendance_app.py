@@ -71,66 +71,34 @@ if st.button("Nhập"):
         
         if not team_info.empty:
             st.write("### Thông tin đội:")
-
+            
             # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
             team = team_info.iloc[0]
-
-            # Khởi tạo session_state cho các checkbox nếu chưa có
-            if 'absent_leader' not in st.session_state:
-                st.session_state.absent_leader = False
-            if 'absent_member2' not in st.session_state:
-                st.session_state.absent_member2 = False
-            if 'absent_member3' not in st.session_state:
-                st.session_state.absent_member3 = False
-
-            # Hiển thị 3 cột: Họ và tên, MSSV, Vắng
-            st.write("### Điền trạng thái vắng mặt:")
-            col1, col2, col3 = st.columns(3)
             
-            # Hàng 1: Đội trưởng
-            with col1:
-                st.markdown(f"**Đội trưởng:** {team['Họ và tên của đội trưởng']}")
-            with col2:
-                st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 2']}")
-            with col3:
-                st.session_state.absent_leader = st.checkbox("Vắng", key="absent_leader", value=st.session_state.absent_leader)
-            
-            # Hàng 2: Thành viên 2
-            with col1:
-                st.markdown(f"**Thành viên thứ 2:** {team['Họ và tên của thành viên thứ 2']}")
-            with col2:
-                st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 2']}")
-            with col3:
-                st.session_state.absent_member2 = st.checkbox("Vắng", key="absent_member2", value=st.session_state.absent_member2)
-            
-            # Hàng 3: Thành viên 3
-            with col1:
-                st.markdown(f"**Thành viên thứ 3:** {team['Họ và tên của thành viên thứ 3']}")
-            with col2:
-                st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 3']}")
-            with col3:
-                st.session_state.absent_member3 = st.checkbox("Vắng", key="absent_member3", value=st.session_state.absent_member3)
+            # Hiển thị thông tin thành viên và checkbox vắng
+            vang_doi_truong = st.checkbox(f"Đội trưởng {team['Họ và tên của đội trưởng']} (MSSV: {team['MSSV thành viên thứ 2']})", key='vang_doi_truong')
+            vang_thanh_vien_2 = st.checkbox(f"Thành viên 2: {team['Họ và tên của thành viên thứ 2']} (MSSV: {team['MSSV thành viên thứ 2']})", key='vang_thanh_vien_2')
+            vang_thanh_vien_3 = st.checkbox(f"Thành viên 3: {team['Họ và tên của thành viên thứ 3']} (MSSV: {team['MSSV thành viên thứ 3']})", key='vang_thanh_vien_3')
 
-            # Nút điểm danh
+            # Khi bấm nút "Điểm danh"
             if st.button("Điểm danh"):
-                # Cập nhật trạng thái "Vắng"
-                absentees = []
-                if st.session_state.absent_leader:
-                    absentees.append(team['Họ và tên của đội trưởng'])
-                if st.session_state.absent_member2:
-                    absentees.append(team['Họ và tên của thành viên thứ 2'])
-                if st.session_state.absent_member3:
-                    absentees.append(team['Họ và tên của thành viên thứ 3'])
-
-                # Ghi vào cột "Vắng"
-                data.loc[team_info.index, 'Vắng'] = ', '.join(absentees) if absentees else 'Không'
-                # Ghi vào cột "Điểm danh"
-                data.loc[team_info.index, 'Điểm danh'] = 'Có'
+                vang = []
                 
-                # Cập nhật Google Sheets
+                if vang_doi_truong:
+                    vang.append(team['Họ và tên của đội trưởng'])
+                if vang_thanh_vien_2:
+                    vang.append(team['Họ và tên của thành viên thứ 2'])
+                if vang_thanh_vien_3:
+                    vang.append(team['Họ và tên của thành viên thứ 3'])
+                
+                # Cập nhật ô "Vắng" và "Điểm danh" trên Google Sheets
+                data.loc[team_info.index, 'Điểm danh'] = 'Có'
+                data.loc[team_info.index, 'Vắng'] = ', '.join(vang) if vang else ''
+                
+                # Lưu dữ liệu lại Google Sheets
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
                 
-                st.success(f"Đã cập nhật điểm danh và thông tin vắng mặt cho đội: {team['Tên đội (phải bắt đầu bằng UIT.)']}")
+                st.success(f"Đã cập nhật điểm danh và vắng: {', '.join(vang) if vang else 'Không có ai vắng'}")
         else:
             st.error("Không tìm thấy đội với thông tin đã cung cấp.")
     else:
