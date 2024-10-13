@@ -143,5 +143,3 @@ if st.button("Nhập"):
                 st.success("Đã cập nhật điểm danh.")
         else:
             st.error("Không tìm thấy đội với thông tin đã cung cấp.")
-else:
-    st.error("Không tải được dữ liệu từ Google Sheet.")
