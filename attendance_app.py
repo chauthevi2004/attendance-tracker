@@ -68,14 +68,15 @@ if not data.empty:
             team = team_info.iloc[0]
             
             # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
-            st.write(f"Tên đội: **{team['Tên đội (phải bắt đầu bằng UIT.)']}**")
+            st.markdown(f"<span style='color: yellow; font-weight: bold;'>Tên đội:</span> **{team['Tên đội (phải bắt đầu bằng UIT.)']}**", unsafe_allow_html=True)
             st.write(f"Email: {team['Email Address']}")
-            st.write(f"Họ và tên đội trưởng: {team['Họ và tên của đội trưởng']}")
-            st.write(f"Họ và tên thành viên thứ 2: {team['Họ và tên của thành viên thứ 2']}")
+            st.markdown(f"<span style='color: yellow;'>Họ và tên đội trưởng:</span> {team['Họ và tên của đội trưởng']}", unsafe_allow_html=True)
+            st.markdown(f"<span style='color: yellow;'>Họ và tên thành viên thứ 2:</span> {team['Họ và tên của thành viên thứ 2']}", unsafe_allow_html=True)
             st.write(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}")            
-            st.write(f"Họ và tên thành viên thứ 3: {team['Họ và tên của thành viên thứ 3']}")
+            st.markdown(f"<span style='color: yellow;'>Họ và tên thành viên thứ 3:</span> {team['Họ và tên của thành viên thứ 3']}", unsafe_allow_html=True)
             st.write(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}")
-            st.write(f"Điểm danh: {team['Điểm danh']}")
+            st.markdown(f"<span style='color: green; font-weight: bold;'>Điểm danh:</span> {team['Điểm danh']}", unsafe_allow_html=True)
+
             
             if st.button("Điểm danh"):
                 # Cập nhật điểm danh và lưu lại vào Google Sheets
