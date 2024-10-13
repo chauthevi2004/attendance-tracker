@@ -71,87 +71,76 @@ data = get_sheet_data(sheet)
 # Nhập MSSV từ người dùng
 mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
 
-# Thiết lập trạng thái ban đầu cho các checkbox nếu chưa tồn tại trong session_state
-if "leader_absent" not in st.session_state:
-    st.session_state.leader_absent = False
-if "member2_absent" not in st.session_state:
-    st.session_state.member2_absent = False
-if "member3_absent" not in st.session_state:
-    st.session_state.member3_absent = False
+# Chỉ xử lý logic khi đã nhập MSSV
+if mssv_input:
+    # Lưu MSSV vào session state
+    st.session_state.query = mssv_input  # Lưu MSSV vào session_state
+    team_info = lookup_team(st.session_state.query, data)
 
-# Thêm nút "Nhập"
-if st.button("Nhập"):
-    if mssv_input:
-        # Lưu MSSV vào session state
-        st.session_state.query = mssv_input  # Lưu MSSV vào session_state
-        team_info = lookup_team(st.session_state.query, data)
-        
-        if not team_info.empty:
-            st.write("### Thông tin đội:")
+    if not team_info.empty:
+        st.write("### Thông tin đội:")
+
+        # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
+        team = team_info.iloc[0]
+
+        # Trích xuất MSSV của đội trưởng từ email
+        leader_mssv = extract_mssv_from_email(team['Email Address'])
+
+        # Hiển thị thông tin theo dạng bảng với ba cột
+        st.markdown("#### Thông tin các thành viên")
+        st.markdown("""
+        <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        # Bảng thành viên với tên, MSSV và checkbox để đánh dấu vắng mặt
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.write("**Họ và tên thành viên**")
+            st.write(f"Đội trưởng: {team['Họ và tên của đội trưởng']}")
+            st.write(f"Thành viên 2: {team['Họ và tên của thành viên thứ 2']}")
+            st.write(f"Thành viên 3: {team['Họ và tên của thành viên thứ 3']}")
+
+        with col2:
+            st.write("**MSSV**")
+            st.write(f"{leader_mssv}")
+            st.write(f"{team['MSSV thành viên thứ 2']}")
+            st.write(f"{team['MSSV thành viên thứ 3']}")
+
+        with col3:
+            st.write("**Vắng**")
+            # Giữ trạng thái của checkbox bằng session_state
+            st.session_state.leader_absent = st.checkbox("Đội trưởng vắng mặt", key="leader_absent", value=st.session_state.get("leader_absent", False))
+            st.session_state.member2_absent = st.checkbox("Thành viên 2 vắng mặt", key="member2_absent", value=st.session_state.get("member2_absent", False))
+            st.session_state.member3_absent = st.checkbox("Thành viên 3 vắng mặt", key="member3_absent", value=st.session_state.get("member3_absent", False))
+
+        # Nút "Điểm danh"
+        if st.button("Điểm danh"):
+            # Cập nhật điểm danh và lưu lại vào Google Sheets
+            data.loc[team_info.index, 'Điểm danh'] = 'Có'
             
-            # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
-            team = team_info.iloc[0]
-            
-            # Trích xuất MSSV của đội trưởng từ email
-            leader_mssv = extract_mssv_from_email(team['Email Address'])
-            
-            # Hiển thị thông tin theo dạng bảng với ba cột
-            st.markdown("#### Thông tin các thành viên")
-            st.markdown("""
-            <style>
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            th, td {
-                border: 1px solid #ddd;
-                padding: 8px;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            # Tạo danh sách các thành viên vắng mặt dựa trên trạng thái session_state
+            absent_list = []
+            if st.session_state.leader_absent:
+                absent_list.append(team['Họ và tên của đội trưởng'])
+            if st.session_state.member2_absent:
+                absent_list.append(team['Họ và tên của thành viên thứ 2'])
+            if st.session_state.member3_absent:
+                absent_list.append(team['Họ và tên của thành viên thứ 3'])
 
-            # Bảng thành viên với tên, MSSV và checkbox để đánh dấu vắng mặt
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.write("**Họ và tên thành viên**")
-                st.write(f"Đội trưởng: {team['Họ và tên của đội trưởng']}")
-                st.write(f"Thành viên 2: {team['Họ và tên của thành viên thứ 2']}")
-                st.write(f"Thành viên 3: {team['Họ và tên của thành viên thứ 3']}")
+            # Cập nhật danh sách thành viên vắng mặt trong Google Sheets
+            data.loc[team_info.index, 'Thành viên vắng mặt'] = ', '.join(absent_list)
 
-            with col2:
-                st.write("**MSSV**")
-                st.write(f"{leader_mssv}")
-                st.write(f"{team['MSSV thành viên thứ 2']}")
-                st.write(f"{team['MSSV thành viên thứ 3']}")
-
-            with col3:
-                st.write("**Vắng**")
-                # Giữ trạng thái của checkbox bằng session_state
-                st.session_state.leader_absent = st.checkbox("Đội trưởng vắng mặt", value=st.session_state.leader_absent)
-                st.session_state.member2_absent = st.checkbox("Thành viên 2 vắng mặt", value=st.session_state.member2_absent)
-                st.session_state.member3_absent = st.checkbox("Thành viên 3 vắng mặt", value=st.session_state.member3_absent)
-
-            # Nút "Điểm danh"
-            if st.button("Điểm danh"):
-                # Cập nhật điểm danh và lưu lại vào Google Sheets
-                data.loc[team_info.index, 'Điểm danh'] = 'Có'
-                
-                # Tạo danh sách các thành viên vắng mặt dựa trên trạng thái session_state
-                absent_list = []
-                if st.session_state.leader_absent:
-                    absent_list.append(team['Họ và tên của đội trưởng'])
-                if st.session_state.member2_absent:
-                    absent_list.append(team['Họ và tên của thành viên thứ 2'])
-                if st.session_state.member3_absent:
-                    absent_list.append(team['Họ và tên của thành viên thứ 3'])
-
-                # Cập nhật danh sách thành viên vắng mặt trong Google Sheets
-                data.loc[team_info.index, 'Thành viên vắng mặt'] = ', '.join(absent_list)
-
-                # Cập nhật vào Google Sheets
-                sheet.update([data.columns.values.tolist()] + data.values.tolist())
-                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.query}")
-        else:
-            st.error("Không tìm thấy đội với thông tin đã cung cấp.")
+            # Cập nhật vào Google Sheets
+            sheet.update([data.columns.values.tolist()] + data.values.tolist())
+            st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.query}")
     else:
-        st.error("Vui lòng nhập thông tin tìm kiếm.")
+        st.error("Không tìm thấy đội với thông tin đã cung cấp.")
