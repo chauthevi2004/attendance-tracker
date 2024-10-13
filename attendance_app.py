@@ -68,7 +68,9 @@ if not data.empty:
             team = team_info.iloc[0]
             
             # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
-            st.write(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}")
+            st.write(f"Họ và tên thành viên thứ 2: {team['Họ và tên của thành viên thứ 2']}")
+            st.write(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}")            
+            st.write(f"Họ và tên thành viên thứ 3: {team['Họ và tên của thành viên thứ 3']}")
             st.write(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}")
             st.write(f"Email: {team['Email Address']}")
             st.write(f"Điểm danh: {team['Điểm danh']}")
