@@ -5,25 +5,28 @@ from oauth2client.service_account import ServiceAccountCredentials
 import streamlit as st
 import pandas as pd
 
-# Hàm để lấy credentials từ biến môi trường
+# Hàm lấy credentials từ biến môi trường
 def get_credentials_from_env():
     google_credentials = os.getenv('GOOGLE_CREDENTIALS')  # Lấy biến môi trường GOOGLE_CREDENTIALS
     if google_credentials is None:
         st.error("GOOGLE_CREDENTIALS không được thiết lập.")
         return None
-    creds_dict = json.loads(google_credentials)
-    return creds_dict
+    try:
+        creds_dict = json.loads(google_credentials)  # Chuyển chuỗi JSON thành dictionary
+        return creds_dict
+    except json.JSONDecodeError as e:
+        st.error(f"Lỗi khi giải mã JSON: {e}")
+        return None
 
 # Kết nối với Google Sheets bằng credentials
 def connect_to_google_sheets_by_id(sheet_id):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    
+
     creds_dict = get_credentials_from_env()
     if creds_dict:
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-        client = gspread.authorize(creds)
-
         try:
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+            client = gspread.authorize(creds)
             sheet = client.open_by_key(sheet_id).sheet1
             return sheet
         except gspread.SpreadsheetNotFound:
@@ -37,16 +40,23 @@ def connect_to_google_sheets_by_id(sheet_id):
 # Lấy dữ liệu từ Google Sheets và chuyển thành DataFrame
 def get_sheet_data(sheet):
     if sheet is not None:
-        data = sheet.get_all_records()  # Lấy toàn bộ dữ liệu từ Google Sheet
-        df = pd.DataFrame(data)
-        return df
+        try:
+            data = sheet.get_all_records()  # Lấy toàn bộ dữ liệu từ Google Sheet
+            df = pd.DataFrame(data)
+            return df
+        except Exception as e:
+            st.error(f"Lỗi khi lấy dữ liệu từ Google Sheet: {e}")
+            return pd.DataFrame()
     else:
         return pd.DataFrame()  # Trả về DataFrame rỗng nếu không kết nối được
 
 # Cập nhật dữ liệu trong Google Sheets
 def update_sheet(sheet, df):
     if sheet is not None:
-        sheet.update([df.columns.values.tolist()] + df.values.tolist())
+        try:
+            sheet.update([df.columns.values.tolist()] + df.values.tolist())
+        except Exception as e:
+            st.error(f"Lỗi khi cập nhật Google Sheet: {e}")
 
 # Chức năng tìm đội theo MSSV
 def lookup_team_by_mssv(mssv, data):
