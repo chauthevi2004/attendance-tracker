@@ -71,6 +71,14 @@ data = get_sheet_data(sheet)
 # Nhập MSSV từ người dùng
 mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
 
+# Thiết lập trạng thái ban đầu cho các checkbox nếu chưa tồn tại trong session_state
+if "leader_absent" not in st.session_state:
+    st.session_state.leader_absent = False
+if "member2_absent" not in st.session_state:
+    st.session_state.member2_absent = False
+if "member3_absent" not in st.session_state:
+    st.session_state.member3_absent = False
+
 # Thêm nút "Nhập"
 if st.button("Nhập"):
     if mssv_input:
@@ -118,14 +126,7 @@ if st.button("Nhập"):
 
             with col3:
                 st.write("**Vắng**")
-                # Lưu trạng thái checkbox trong session_state, chưa cập nhật ngay
-                if "leader_absent" not in st.session_state:
-                    st.session_state.leader_absent = False
-                if "member2_absent" not in st.session_state:
-                    st.session_state.member2_absent = False
-                if "member3_absent" not in st.session_state:
-                    st.session_state.member3_absent = False
-
+                # Giữ trạng thái của checkbox bằng session_state
                 st.session_state.leader_absent = st.checkbox("Đội trưởng vắng mặt", value=st.session_state.leader_absent)
                 st.session_state.member2_absent = st.checkbox("Thành viên 2 vắng mặt", value=st.session_state.member2_absent)
                 st.session_state.member3_absent = st.checkbox("Thành viên 3 vắng mặt", value=st.session_state.member3_absent)
