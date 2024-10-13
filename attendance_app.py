@@ -71,25 +71,58 @@ if st.button("Nhập"):
         
         if not team_info.empty:
             st.write("### Thông tin đội:")
-            
+
             # Lấy hàng đầu tiên của team_info để hiển thị các thông tin
             team = team_info.iloc[0]
-            
-            # Hiển thị thông tin theo dạng thẳng đứng, mỗi thông tin một dòng
-            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
-            st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
-            st.markdown(f"Đội trưởng: <span style='color: yellow;'>{team['Họ và tên của đội trưởng']}</span>", unsafe_allow_html=True)
-            st.markdown(f"Thành viên thứ 2: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 2']}</span>", unsafe_allow_html=True)
-            st.markdown(f"MSSV thành viên thứ 2: {team['MSSV thành viên thứ 2']}", unsafe_allow_html=True)            
-            st.markdown(f"Thành viên thứ 3: <span style='color: yellow;'>{team['Họ và tên của thành viên thứ 3']}</span>", unsafe_allow_html=True)
-            st.markdown(f"MSSV thành viên thứ 3: {team['MSSV thành viên thứ 3']}", unsafe_allow_html=True)
-            st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
+            # Hiển thị 3 cột: Họ và tên, MSSV, Vắng
+            st.write("### Điền trạng thái vắng mặt:")
+            col1, col2, col3 = st.columns(3)
+            
+            # Hàng 1: Đội trưởng
+            with col1:
+                st.markdown(f"**Đội trưởng:** {team['Họ và tên của đội trưởng']}")
+            with col2:
+                st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 2']}")
+            with col3:
+                absent_leader = st.checkbox("Vắng", key="absent_leader")
+            
+            # Hàng 2: Thành viên 2
+            with col1:
+                st.markdown(f"**Thành viên thứ 2:** {team['Họ và tên của thành viên thứ 2']}")
+            with col2:
+                st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 2']}")
+            with col3:
+                absent_member2 = st.checkbox("Vắng", key="absent_member2")
+            
+            # Hàng 3: Thành viên 3
+            with col1:
+                st.markdown(f"**Thành viên thứ 3:** {team['Họ và tên của thành viên thứ 3']}")
+            with col2:
+                st.markdown(f"**MSSV:** {team['MSSV thành viên thứ 3']}")
+            with col3:
+                absent_member3 = st.checkbox("Vắng", key="absent_member3")
+
+            # Nút điểm danh
             if st.button("Điểm danh"):
-                # Cập nhật điểm danh và lưu lại vào Google Sheets
+                # Cập nhật trạng thái "Vắng"
+                absentees = []
+                if absent_leader:
+                    absentees.append(team['Họ và tên của đội trưởng'])
+                if absent_member2:
+                    absentees.append(team['Họ và tên của thành viên thứ 2'])
+                if absent_member3:
+                    absentees.append(team['Họ và tên của thành viên thứ 3'])
+
+                # Ghi vào cột "Vắng"
+                data.loc[team_info.index, 'Vắng'] = ', '.join(absentees) if absentees else 'Không'
+                # Ghi vào cột "Điểm danh"
                 data.loc[team_info.index, 'Điểm danh'] = 'Có'
+                
+                # Cập nhật Google Sheets
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
-                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.mssv}")
+                
+                st.success(f"Đã cập nhật điểm danh và thông tin vắng mặt cho đội: {team['Tên đội (phải bắt đầu bằng UIT.)']}")
         else:
             st.error("Không tìm thấy đội với thông tin đã cung cấp.")
     else:
