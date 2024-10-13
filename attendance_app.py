@@ -50,6 +50,11 @@ sheet = connect_to_google_sheets_by_id(sheet_id)
 # Tải dữ liệu từ Google Sheets
 data = get_sheet_data(sheet)
 
+# Debug: print column names to check if they match
+if not data.empty:
+    st.write("### Debug: Available columns in the data")
+    st.write(data.columns.tolist())  # This will print the column names in the Streamlit app
+
 # Nhập MSSV từ người dùng
 mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
 
@@ -71,14 +76,15 @@ if st.button("Nhập"):
             absent_member2 = col3.checkbox(f"Vắng", key="member2_absent")
             absent_member3 = col3.checkbox(f"Vắng", key="member3_absent")
 
+            # Ensure the correct column names are used here
             col1.markdown(f"Đội trưởng: {team['Họ và tên của đội trưởng']}")
-            col2.markdown(f"MSSV: {team['MSSV đội trưởng']}")
+            col2.markdown(f"MSSV: {team.get('MSSV đội trưởng', 'N/A')}")  # Fallback in case the column doesn't exist
 
             col1.markdown(f"Thành viên thứ 2: {team['Họ và tên của thành viên thứ 2']}")
-            col2.markdown(f"MSSV: {team['MSSV thành viên thứ 2']}")
+            col2.markdown(f"MSSV: {team.get('MSSV thành viên thứ 2', 'N/A')}")  # Fallback in case the column doesn't exist
 
             col1.markdown(f"Thành viên thứ 3: {team['Họ và tên của thành viên thứ 3']}")
-            col2.markdown(f"MSSV: {team['MSSV thành viên thứ 3']}")
+            col2.markdown(f"MSSV: {team.get('MSSV thành viên thứ 3', 'N/A')}")  # Fallback in case the column doesn't exist
 
             if st.button("Điểm danh"):
                 # Cập nhật danh sách vắng mặt
