@@ -30,12 +30,12 @@ The required packages are:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/icpc-attendance-tracker.git
+   https://github.com/chauthevi2004/attendance-tracker.git
    ```
 
 2. Navigate into the project directory:
    ```bash
-   cd icpc-attendance-tracker
+   cd attendance-tracker
    ```
 
 3. Set up your Google Cloud credentials. In **Streamlit**, these credentials should be stored in `st.secrets`. You will need a **service account** with access to the Google Sheets API. Example `secrets.toml` configuration:
