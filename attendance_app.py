@@ -86,6 +86,10 @@ data = get_sheet_data(sheet)
 # Đảm bảo MSSV không có dấu phẩy
 data = format_mssv_columns(data)
 
+# Nhập thông tin từ người dùng
+mssv_input = st.text_input("Nhập thông tin để tìm kiếm đội:", "")
+
+
 # Thêm nút "Nhập"
 if st.button("Nhập"):
     if mssv_input:
