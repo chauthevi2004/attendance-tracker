@@ -7,13 +7,14 @@ import json
 
 
 # Kết nối với Google Sheets API bằng ID của trang tính
-# Kết nối với Google Sheets API bằng ID của trang tính
 def connect_to_google_sheets_by_id(sheet_id):
     # Phạm vi quyền truy cập
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     
-    # Đọc thông tin credentials từ Streamlit secrets
-    creds_dict = json.loads(st.secrets["gcp_service_account"])  # Lấy thông tin từ st.secrets
+    # Đọc thông tin credentials từ Streamlit secrets (không cần json.loads)
+    creds_dict = st.secrets["gcp_service_account"]  # Sử dụng trực tiếp secrets
+    
+    # Tạo credentials từ từ điển
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     
     # Ủy quyền kết nối
