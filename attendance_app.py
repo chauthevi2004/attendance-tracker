@@ -86,11 +86,12 @@ if st.button("Nhập"):
             st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
             if st.button("Điểm danh"):
-                # Cập nhật điểm danh và lưu lại vào Google Sheets
+                # Luôn cho phép điểm danh và cập nhật dữ liệu
                 data.loc[team_info.index, 'Điểm danh'] = 'Yes'
                 sheet.update([data.columns.values.tolist()] + data.values.tolist())
-                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.mssv}")
+                st.success(f"Đã điểm danh cho đội với MSSV: {st.session_state.query}")
         else:
             st.error("Không tìm thấy đội với thông tin đã cung cấp.")
     else:
         st.error("Vui lòng nhập thông tin tìm kiếm.")
+
