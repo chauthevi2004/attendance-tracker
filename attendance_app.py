@@ -74,7 +74,7 @@ def mark_attendance(mssv, data, absent_members):
     return data
 
 # ID của Google Sheet
-sheet_id = "1kpKnO1VpkuDHMWi_jWP0Mnd8FGwO9f"
+sheet_id = "1kpKnO1VpkuDHMWi_jWP0Mnd8FGwO9f-k"
 sheet = connect_to_google_sheets_by_id(sheet_id)
 
 # Streamlit app
