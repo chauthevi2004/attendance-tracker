@@ -12,7 +12,7 @@ def connect_to_google_sheets_by_id(sheet_id):
     client = gspread.authorize(creds)
 
     try:
-        sheet = client.open_by_key(sheet_id).sheet3
+        sheet = client.open_by_key(sheet_id).sheet1
         return sheet
     except gspread.SpreadsheetNotFound:
         st.error("Không tìm thấy Google Sheet. Kiểm tra ID hoặc quyền chia sẻ.")
