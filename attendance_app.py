@@ -97,7 +97,7 @@ if not data.empty:
             team = team_info.iloc[0]
             
             st.write("### Thông tin đội")
-            st.markdown(f"Tên đội: <span style='color: yellow; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
+            st.markdown(f"Tên đội: <span style='color: blue; font-weight: bold;'>{team['Tên đội (phải bắt đầu bằng UIT.)']}</span>", unsafe_allow_html=True)
             st.markdown(f"Email: {team['Email Address']}", unsafe_allow_html=True)
             st.markdown(f"Điểm danh: <span style='color: green; font-weight: bold;'>{team['Điểm danh']}</span>", unsafe_allow_html=True)
 
