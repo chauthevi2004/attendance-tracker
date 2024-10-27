@@ -5,7 +5,7 @@ import pandas as pd
 import re
 
 # Kết nối với Google Sheets API bằng ID của trang tính
-def connect_to_google_sheets_by_id(sheet_id):
+def connect_to_google_sheets_by_id(sheet_id, sheet_name="sheet1"):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds_dict = st.secrets["gcp_service_account"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
