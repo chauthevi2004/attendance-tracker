@@ -12,7 +12,7 @@ def connect_to_google_sheets_by_id(sheet_id):
     client = gspread.authorize(creds)
 
     try:
-        sheet = client.open_by_key(sheet_id).sheet1
+        sheet = client.open_by_key(sheet_id).worksheet("Bac-1")
         return sheet
     except gspread.SpreadsheetNotFound:
         st.error("Không tìm thấy Google Sheet. Kiểm tra ID hoặc quyền chia sẻ.")
@@ -75,7 +75,7 @@ def mark_attendance(mssv, data, absent_members):
 
 # ID của Google Sheet
 sheet_id = "1aeDicvTqd6KwvIRU_gcueX2QICfeumv4BxY5mOyZBMg"
-sheet = connect_to_google_sheets_by_id(sheet_id)
+sheet = connect_to_google_sheets_by_id(sheet_id, "Bac-1")
 
 # Streamlit app
 st.title("ICPC Attendance Tracker")
